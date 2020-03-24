@@ -22,6 +22,8 @@ func ConfigWithHost(sec, site_sec string, host string) {
 		panic(errors.New("require secret of reCAPTCHA"))
 	} else if site_sec == "" {
 		panic(errors.New("require site secret of reCAPTCHA"))
+	} else if host == "" {
+		panic(errors.New("require host of reCAPTCHA"))
 	}
 
 	in_sec, in_site_sec, in_host = sec, site_sec, host
