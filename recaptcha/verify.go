@@ -1,11 +1,11 @@
 package recaptcha
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 const (
@@ -34,21 +34,14 @@ type VerifyResult struct {
 func Verify(token string, remoteip string) (vr *VerifyResult, err error) {
 	reqUrl := fmt.Sprintf(in_verify_url_f, in_host)
 
-	var data = map[string]string{
-		"secret":   in_sec,
-		"response": token,
-	}
+	var data = make([]string, 0, 3)
+	data = append(data, fmt.Sprintf("secret=%s", in_sec))
+	data = append(data, fmt.Sprintf("response=%s", token))
 	if remoteip != "" {
-		data["remoteip"] = remoteip
+		data = append(data, fmt.Sprintf("remoteip=%s", remoteip))
 	}
 
-	jsonData, je := json.Marshal(data)
-	if je != nil {
-		err = je
-		return
-	}
-
-	resp, re := httpCli.Post(reqUrl, "application/json", bytes.NewReader(jsonData))
+	resp, re := httpCli.Post(reqUrl, "application/x-www-form-urlencoded", strings.NewReader(strings.Join(data, "&")))
 	if re != nil {
 		err = re
 		return
